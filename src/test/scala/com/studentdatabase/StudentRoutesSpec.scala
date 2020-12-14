@@ -49,7 +49,7 @@ class StudentRoutesSpec extends WordSpec with Matchers with ScalaFutures with Sc
 
     //#testing-post
     "be able to add users (POST /students)" in {
-      val student = Student("Kapi", 42, "ok", "3.2")
+      val student = Student("Kapi", 42, "ok", "3.2", "Computer Science")
       //val studentEntity = Marshal(student).to[MessageEntity].futureValue // futureValue is from ScalaFutures
       val studentEntity = Marshal(student).to[MessageEntity].futureValue
       // using the RequestBuilding DSL:

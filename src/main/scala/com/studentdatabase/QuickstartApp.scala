@@ -9,11 +9,8 @@ import java.io._
 
 import scala.util.{Failure, Success}
 
-//#main-class
 object QuickstartApp {
-  //#start-http-server
   private def startHttpServer(routes: Route)(implicit system: ActorSystem[_]): Unit = {
-    // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
 
     val whatismyip: URL = new URL("http://checkip.amazonaws.com")
@@ -32,9 +29,7 @@ object QuickstartApp {
         system.terminate()
     }
   }
-  //#start-http-server
   def main(args: Array[String]): Unit = {
-    //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       val studentDatabaseActor = context.spawn(StudentDatabase(), "StudentDatabaseActor")
       context.watch(studentDatabaseActor)
@@ -46,7 +41,5 @@ object QuickstartApp {
       Behaviors.empty
     }
     val system = ActorSystem[Nothing](rootBehavior, "HelloAkkaHttpServer")
-    //#server-bootstrapping
   }
 }
-//#main-class
