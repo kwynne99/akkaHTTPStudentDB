@@ -1,12 +1,11 @@
-package com.example
+package com.studentdatabase
 
 import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
 
-import scala.util.Failure
-import scala.util.Success
+import scala.util.{Failure, Success}
 
 //#main-class
 object QuickstartApp {
@@ -29,11 +28,12 @@ object QuickstartApp {
   def main(args: Array[String]): Unit = {
     //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
-      val userRegistryActor = context.spawn(UserRegistry(), "UserRegistryActor")
-      context.watch(userRegistryActor)
+      val studentDatabaseActor = context.spawn(StudentDatabase(), "StudentDatabaseActor")
+      context.watch(studentDatabaseActor)
 
-      val routes = new UserRoutes(userRegistryActor)(context.system)
-      startHttpServer(routes.userRoutes)(context.system)
+      val routes = new StudentRoutes(studentDatabaseActor)(context.system)
+      startHttpServer(routes.studentRoutes)(context.system)
+
 
       Behaviors.empty
     }

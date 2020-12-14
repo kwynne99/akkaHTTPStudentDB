@@ -1,16 +1,13 @@
-package com.example
+package com.studentdatabase
 
-//#user-routes-spec
-//#test-top
 import akka.actor.testkit.typed.scaladsl.ActorTestKit
 import akka.http.scaladsl.marshalling.Marshal
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{ Matchers, WordSpec }
+import org.scalatest.{Matchers, WordSpec}
 
-//#set-up
-class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with ScalatestRouteTest {
+class StudentRoutesSpec extends WordSpec with Matchers with ScalaFutures with ScalatestRouteTest {
   //#test-top
 
   // the Akka HTTP route testkit does not yet support a typed actor system (https://github.com/akka/akka-http/issues/2036)
@@ -24,8 +21,8 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
   // We use the real UserRegistryActor to test it while we hit the Routes,
   // but we could "mock" it by implementing it in-place or by using a TestProbe
   // created with testKit.createTestProbe()
-  val userRegistry = testKit.spawn(UserRegistry())
-  lazy val routes = new UserRoutes(userRegistry).userRoutes
+  val studentDatabase = testKit.spawn(StudentDatabase())
+  lazy val routes = new StudentRoutes(studentDatabase).studentRoutes
 
   // use the json formats to marshal and unmarshall objects in the test
   import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
@@ -33,10 +30,10 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
   //#set-up
 
   //#actual-test
-  "UserRoutes" should {
-    "return no users if no present (GET /users)" in {
+  "StudentRoutes" should {
+    "return no students if no present (GET /students)" in {
       // note that there's no need for the host part in the uri:
-      val request = HttpRequest(uri = "/users")
+      val request = HttpRequest(uri = "/students")
 
       request ~> routes ~> check {
         status should ===(StatusCodes.OK)
@@ -45,18 +42,18 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
         contentType should ===(ContentTypes.`application/json`)
 
         // and no entries should be in the list:
-        entityAs[String] should ===("""{"users":[]}""")
+        entityAs[String] should ===("""{"students":[]}""")
       }
     }
     //#actual-test
 
     //#testing-post
-    "be able to add users (POST /users)" in {
-      val user = User("Kapi", 42, "jp")
-      val userEntity = Marshal(user).to[MessageEntity].futureValue // futureValue is from ScalaFutures
-
+    "be able to add users (POST /students)" in {
+      val student = Student("Kapi", 42, "ok", "3.2")
+      //val studentEntity = Marshal(student).to[MessageEntity].futureValue // futureValue is from ScalaFutures
+      val studentEntity = Marshal(student).to[MessageEntity].futureValue
       // using the RequestBuilding DSL:
-      val request = Post("/users").withEntity(userEntity)
+      val request = Post("/students").withEntity(studentEntity)
 
       request ~> routes ~> check {
         status should ===(StatusCodes.Created)
@@ -65,25 +62,12 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
         contentType should ===(ContentTypes.`application/json`)
 
         // and we know what message we're expecting back:
-        entityAs[String] should ===("""{"description":"User Kapi created."}""")
+        entityAs[String] should ===("""{"description":"Student Kapi has been added."}""")
       }
     }
     //#testing-post
 
-    "be able to remove users (DELETE /users)" in {
-      // user the RequestBuilding DSL provided by ScalatestRouteSpec:
-      val request = Delete(uri = "/users/Kapi")
 
-      request ~> routes ~> check {
-        status should ===(StatusCodes.OK)
-
-        // we expect the response to be json:
-        contentType should ===(ContentTypes.`application/json`)
-
-        // and no entries should be in the list:
-        entityAs[String] should ===("""{"description":"User Kapi deleted."}""")
-      }
-    }
     //#actual-test
   }
   //#actual-test
@@ -91,4 +75,5 @@ class UserRoutesSpec extends WordSpec with Matchers with ScalaFutures with Scala
   //#set-up
 }
 //#set-up
-//#user-routes-spec
+//#student-routes-spec
+
