@@ -4,6 +4,8 @@ import akka.actor.typed.ActorSystem
 import akka.actor.typed.scaladsl.Behaviors
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Route
+import java.net._
+import java.io._
 
 import scala.util.{Failure, Success}
 
@@ -14,7 +16,13 @@ object QuickstartApp {
     // Akka HTTP still needs a classic ActorSystem to start
     import system.executionContext
 
-    val futureBinding = Http().newServerAt("localhost", 8080).bind(routes)
+    val whatismyip: URL = new URL("http://checkip.amazonaws.com")
+    val in: BufferedReader = new BufferedReader(new InputStreamReader(whatismyip.openStream()))
+    val ip: String = in.readLine()
+
+    //val futureBinding = Http().newServerAt("localhost", 8080).bind(routes)
+    val futureBinding = Http().newServerAt(InetAddress.getLocalHost.getHostAddress, 8080).bind(routes)
+    //val futureBinding = Http().newServerAt(ip, 8080).bind(routes)
     futureBinding.onComplete {
       case Success(binding) =>
         val address = binding.localAddress
