@@ -10,3 +10,5 @@ Students can be removed when identified by their name.
 The whole database can be cleared by calling delete on the "/students" path.
 
 WIP: New routes used for identifying classes available at the University, as well as which students are enrolled in them.
+
+Authors: Kyle Wynne & Alex Mozeak
