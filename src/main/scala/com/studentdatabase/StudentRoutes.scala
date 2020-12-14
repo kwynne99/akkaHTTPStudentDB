@@ -23,6 +23,7 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
   def newStudent(student: Student): Future[ActionPerformed] = studentDatabase.ask(NewStudent(student, _))
   def removeStudent(name: String): Future[ActionPerformed] = studentDatabase.ask(RemoveStudent(name, _))
   def changeMajor(name: String, major: String): Future[ActionPerformed] = studentDatabase.ask(ChangeMajor(name, major, _))
+  def clearDatabase(): Future[ActionPerformed] = studentDatabase.ask(ClearDatabase)
 
   val studentRoutes: Route =
     pathPrefix("students") {
@@ -39,7 +40,11 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
                   complete((StatusCodes.Created, performed))
                 }
               }
-            })
+            },
+            delete {
+              onSuccess(clearDatabase()) { performed => complete((StatusCodes.OK, performed))}
+            }
+          )
         },
         //#users-get-delete
         //#users-get-post
