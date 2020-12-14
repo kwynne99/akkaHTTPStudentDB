@@ -19,6 +19,7 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
   private implicit val timeout = Timeout.create(system.settings.config.getDuration("my-app.routes.ask-timeout"))
 
   def getStudents(): Future[Students] = studentDatabase.ask(GetStudents)
+  def findStudents(name: String): Future[Students] = studentDatabase.ask(FindStudents(name, _))
   def getStudent(name: String): Future[GetStudentResponse] = studentDatabase.ask(GetStudent(name, _))
   def newStudent(student: Student): Future[ActionPerformed] = studentDatabase.ask(NewStudent(student, _))
   def removeStudent(name: String): Future[ActionPerformed] = studentDatabase.ask(RemoveStudent(name, _))
@@ -58,6 +59,9 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
                 }
               }
               //#retrieve-user-info
+            },
+            get {
+              complete(findStudents(name))
             },
             delete {
               onSuccess(removeStudent(name)) { performed => complete((StatusCodes.OK, performed))}

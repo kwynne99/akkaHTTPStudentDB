@@ -10,6 +10,7 @@ final case class Students(students: immutable.Seq[Student])
 object StudentDatabase {
   sealed trait Command
   final case class GetStudents(replyTo: ActorRef[Students]) extends Command
+  final case class FindStudents(name: String, replyTo:ActorRef[Students]) extends Command
   final case class NewStudent(student: Student, replyTo: ActorRef[ActionPerformed]) extends Command
   final case class GetStudent(name: String, replyTo: ActorRef[GetStudentResponse]) extends Command
   final case class RemoveStudent(name: String, replyTo: ActorRef[ActionPerformed]) extends Command
@@ -24,6 +25,9 @@ object StudentDatabase {
   private def database(students: Set[Student]): Behavior[Command] = Behaviors.receiveMessage {
     case GetStudents(replyTo) =>
       replyTo ! Students(students.toSeq)
+      Behaviors.same
+    case FindStudents(name, replyTo) =>
+      replyTo ! Students(students.filter(_.name.contains(name)).toSeq)
       Behaviors.same
     case NewStudent(student, replyTo) if students.contains(student) =>
       replyTo ! ActionPerformed(s"Student ${student.name} already exists!")
