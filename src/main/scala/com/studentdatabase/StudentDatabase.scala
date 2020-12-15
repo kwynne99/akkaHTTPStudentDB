@@ -24,7 +24,6 @@ object StudentDatabase {
   final case class GetStudent(name: String, replyTo: ActorRef[GetStudentResponse]) extends Operation // Return a single student by name.
   final case class RemoveStudent(name: String, replyTo: ActorRef[ActionPerformed]) extends Operation // Remove a student from the database by name.
   final case class ClearDatabase(replyTo: ActorRef[ActionPerformed]) extends Operation // Resets the database with an empty set.
-  // final case class ChangeMajor(name: String, major: String, replyTo: ActorRef[ActionPerformed]) extends Operation
 
   // Messages to be passed to the top-level Actor System
   final case class GetStudentResponse(maybeStudent: Option[Student])
