@@ -15,7 +15,7 @@ object StudentDatabase {
   final case class GetStudent(name: String, replyTo: ActorRef[GetStudentResponse]) extends Command
   final case class RemoveStudent(name: String, replyTo: ActorRef[ActionPerformed]) extends Command
   final case class ClearDatabase(replyTo: ActorRef[ActionPerformed]) extends Command
-  final case class ChangeMajor(name: String, major: String, replyTo: ActorRef[ActionPerformed]) extends Command
+  //final case class ChangeMajor(name: String, major: String, replyTo: ActorRef[ActionPerformed]) extends Command
 
   final case class GetStudentResponse(maybeStudent: Option[Student])
   final case class ActionPerformed(description: String)
@@ -41,10 +41,6 @@ object StudentDatabase {
     case RemoveStudent(name, replyTo) =>
       replyTo ! ActionPerformed(s"Student $name removed from database.")
       database(students.filterNot(_.name == name))
-    /*case ChangeMajor(name, major, replyTo) =>
-      replyTo ! ActionPerformed(s"Student $name major changed to $major")
-      val student = students.filter(_.name == name)
-      database(student.last.Major = major)*/
     case ClearDatabase(replyTo) =>
       replyTo ! ActionPerformed(s"Student database has been cleared.")
       database(Set.empty)

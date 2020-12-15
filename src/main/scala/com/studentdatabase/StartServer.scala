@@ -9,7 +9,7 @@ import java.io._
 
 import scala.util.{Failure, Success}
 
-object QuickstartApp {
+object StartServer {
   private def startHttpServer(routes: Route)(implicit system: ActorSystem[_]): Unit = {
     import system.executionContext
 

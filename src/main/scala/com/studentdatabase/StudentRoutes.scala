@@ -23,14 +23,13 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
   def getStudent(name: String): Future[GetStudentResponse] = studentDatabase.ask(GetStudent(name, _))
   def newStudent(student: Student): Future[ActionPerformed] = studentDatabase.ask(NewStudent(student, _))
   def removeStudent(name: String): Future[ActionPerformed] = studentDatabase.ask(RemoveStudent(name, _))
-  def changeMajor(name: String, major: String): Future[ActionPerformed] = studentDatabase.ask(ChangeMajor(name, major, _))
   def clearDatabase(): Future[ActionPerformed] = studentDatabase.ask(ClearDatabase)
 
   val studentRoutes: Route =
     pathPrefix("students") {
       concat(
-        //#users-get-delete
         pathEnd {
+          //get-post-delete (GetStudents, NewStudents, ClearDatabase)
           concat(
             get {
               complete(getStudents())
@@ -46,19 +45,17 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
               onSuccess(clearDatabase()) { performed => complete((StatusCodes.OK, performed))}
             }
           )
+          //get-post-delete (GetStudents, NewStudents, ClearDatabase)
         },
-        //#users-get-delete
-        //#users-get-post
         path(Segment) { name =>
           concat(
+            //get-get-delete (GetStudent, FindStudents, RemoveStudent)
             get {
-              //#retrieve-user-info
               rejectEmptyResponse {
                 onSuccess(getStudent(name)) { response =>
                   complete(response.maybeStudent)
                 }
               }
-              //#retrieve-user-info
             },
             get {
               complete(findStudents(name))
@@ -66,9 +63,9 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Command])(implicit
             delete {
               onSuccess(removeStudent(name)) { performed => complete((StatusCodes.OK, performed))}
             }
+            //get-get-delete (GetStudent, FindStudents, RemoveStudent)
             )
         })
-      //#users-get-delete
     }
-  //#all-routes
+  //all-routes
 }
