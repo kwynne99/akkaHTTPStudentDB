@@ -27,13 +27,14 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Operation])(implic
   def getStudent(name: String): Future[GetStudentResponse] = studentDatabase.ask(GetStudent(name, _))
   def newStudent(student: Student): Future[ActionPerformed] = studentDatabase.ask(NewStudent(student, _))
   def removeStudent(name: String): Future[ActionPerformed] = studentDatabase.ask(RemoveStudent(name, _))
-  // def changeMajor(name: String, major: String): Future[ActionPerformed] = studentDatabase.ask(ChangeMajor(name, major, _))
+
   def clearDatabase(): Future[ActionPerformed] = studentDatabase.ask(ClearDatabase)
 
   val studentRoutes: Route =
     pathPrefix("students") {
       concat(
-        pathEnd { // GET, POST, DELETE to route 'http://$hostname/students'
+        pathEnd {
+          //get-post-delete (GetStudents, NewStudents, ClearDatabase)
           concat(
             get {
               complete(getStudents())
@@ -49,9 +50,11 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Operation])(implic
               onSuccess(clearDatabase()) { performed => complete((StatusCodes.OK, performed))}
             }
           )
+          //get-post-delete (GetStudents, NewStudents, ClearDatabase)
         },
-        path(Segment) { name => // GET, DELETE to route 'http://$hostname/students/$name'
+        path(Segment) { name =>
           concat(
+            //get-get-delete (GetStudent, FindStudents, RemoveStudent)
             get {
               rejectEmptyResponse {
                 onSuccess(getStudent(name)) { response =>
@@ -65,7 +68,9 @@ class StudentRoutes(studentDatabase: ActorRef[StudentDatabase.Operation])(implic
             delete {
               onSuccess(removeStudent(name)) { performed => complete((StatusCodes.OK, performed))}
             }
+            //get-get-delete (GetStudent, FindStudents, RemoveStudent)
             )
         })
     }
+  //all-routes
 }
